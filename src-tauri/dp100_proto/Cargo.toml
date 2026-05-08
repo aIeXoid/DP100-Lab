@@ -1,0 +1,8 @@
+[package]
+name = "dp100_proto"
+version = "0.1.0"
+edition = "2021"
+description = "USB HID protocol library for Alientek DP100 power supply"
+
+[dependencies]
+hidapi = "2"

@@ -1,0 +1,114 @@
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+  --font-mono: "SF Mono", SFMono-Regular, ui-monospace, Menlo, monospace;
+  --font-rounded: "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --bg-window: #f5f5f7;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --bg-tertiary: #e8e8ed;
+  --bg-card: rgba(255, 255, 255, 0.7);
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #86868b;
+  --border: rgba(0, 0, 0, 0.08);
+  --separator: rgba(0, 0, 0, 0.06);
+  --ring-focus: rgba(0, 122, 255, 0.3);
+
+  --system-blue: #007aff;
+  --system-green: #34c759;
+  --system-orange: #ff9500;
+  --system-red: #ff3b30;
+  --system-purple: #af52de;
+  --system-teal: #5ac8fa;
+  --system-gray: #8e8e93;
+
+  --color-voltage: #f5c542;
+  --color-current: #34c759;
+  --color-power: #af52de;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 0.5px 0 rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04);
+
+  --titlebar-height: 52px;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-window: #1e1e1e;
+    --bg-primary: #1c1c1e;
+    --bg-secondary: #2c2c2e;
+    --bg-tertiary: #3a3a3c;
+    --bg-card: rgba(44, 44, 46, 0.6);
+    --text-primary: #f5f5f7;
+    --text-secondary: #98989d;
+    --text-tertiary: #6e6e73;
+    --border: rgba(255, 255, 255, 0.08);
+    --separator: rgba(255, 255, 255, 0.06);
+    --ring-focus: rgba(10, 132, 255, 0.4);
+
+    --system-blue: #0a84ff;
+    --system-green: #30d158;
+    --system-orange: #ff9f0a;
+    --system-red: #ff453a;
+    --system-purple: #bf5af2;
+    --system-teal: #64d2ff;
+    --system-gray: #636366;
+
+    --color-voltage: #ffd60a;
+    --color-current: #30d158;
+    --color-power: #bf5af2;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-card: 0 0.5px 0 rgba(255, 255, 255, 0.03), 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input, button, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Disable WebView context menu in production */
+body {
+  -webkit-user-select: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--system-blue);
+  outline-offset: 1px;
+  border-radius: var(--radius-sm);
+}
