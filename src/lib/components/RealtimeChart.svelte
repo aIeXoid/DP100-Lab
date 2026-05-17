@@ -3,6 +3,7 @@
   import uPlot from "uplot";
   import "uplot/dist/uPlot.min.css";
   import { history, loggingStatus, startLogging, stopLogging, setPollRate } from "$lib/stores/device";
+  import { t } from "$lib/i18n";
 
   let container: HTMLDivElement;
   let chart: uPlot | null = null;
@@ -76,7 +77,7 @@
           const p = u.data[3]?.[idx] ?? 0;
 
           const sec = Math.round(Date.now() / 1000 - ts);
-          tooltipTime = sec === 0 ? "now" : `-${sec}s`;
+          tooltipTime = sec === 0 ? $t("now") : `-${sec}s`;
           tooltipVoltage = v;
           tooltipCurrent = i;
           tooltipPower = p;
@@ -116,7 +117,7 @@
           values: (_self: uPlot, splits: number[]) =>
             splits.map((v: number) => {
               const sec = Math.round(Date.now() / 1000 - v);
-              return sec === 0 ? "now" : `-${sec}s`;
+              return sec === 0 ? $t("now") : `-${sec}s`;
             }),
         },
         {
@@ -148,21 +149,21 @@
       series: [
         {},
         {
-          label: "Voltage",
+          label: $t("voltage"),
           stroke: c.voltage,
           width: 1.5,
           fill: c.voltage + "10",
           scale: "y",
         },
         {
-          label: "Current",
+          label: $t("current"),
           stroke: c.current,
           width: 1.5,
           fill: c.current + "10",
           scale: "current",
         },
         {
-          label: "Power",
+          label: $t("power"),
           stroke: c.power,
           width: 1,
           dash: [4, 4],
@@ -207,7 +208,7 @@
     if (!container) return 200;
     const parent = container.closest('.chart-container');
     if (!parent) return 200;
-    const header = parent.querySelector('.chart-header');
+    const header = parent.querySelector<HTMLElement>('.chart-header');
     const headerH = header ? header.offsetHeight + 8 : 30;
     return Math.max(100, parent.clientHeight - headerH - 22);
   }
@@ -236,6 +237,11 @@
     };
   });
 
+  $effect(() => {
+    $t("language");
+    if (container) createChart();
+  });
+
   onDestroy(() => {
     cancelAnimationFrame(rafId);
     chart?.destroy();
@@ -244,23 +250,23 @@
 
 <div class="chart-container">
   <div class="chart-header">
-    <span class="chart-title">Output</span>
+    <span class="chart-title">{$t("output")}</span>
     <div class="chart-controls">
       {#if $loggingStatus.active}
-        <span class="rec-info">⏺ {$loggingStatus.samples} samples · {Math.floor($loggingStatus.duration_secs)}s</span>
-        <button class="ctrl-btn recording" onclick={stopLogging} title="Stop recording">
+        <span class="rec-info">{$t("recording")} {$t("recordingInfo", { samples: $loggingStatus.samples, duration: Math.floor($loggingStatus.duration_secs) })}</span>
+        <button class="ctrl-btn recording" onclick={stopLogging} title={$t("stopRecording")}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <rect x="2.5" y="2.5" width="9" height="9" rx="1" fill="currentColor"/>
           </svg>
         </button>
       {:else}
-        <button class="ctrl-btn" onclick={startLogging} title="Record to CSV">
+        <button class="ctrl-btn" onclick={startLogging} title={$t("recordToCsv")}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <circle cx="7" cy="7" r="4.5" fill="var(--system-red)"/>
           </svg>
         </button>
       {/if}
-      <button class="ctrl-btn" class:active={paused} onclick={togglePause} title={paused ? "Resume" : "Pause"}>
+      <button class="ctrl-btn" class:active={paused} onclick={togglePause} title={paused ? $t("resume") : $t("pause")}>
         {#if paused}
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M3 1.5L12 7L3 12.5V1.5Z" fill="currentColor"/>
@@ -272,15 +278,15 @@
           </svg>
         {/if}
       </button>
-      <button class="ctrl-btn" onclick={clearChart} title="Clear chart">
+      <button class="ctrl-btn" onclick={clearChart} title={$t("clearChart")}>
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M2.5 4h9M5 4V2.5h4V4M3.5 4v7.5h7V4M6 6.5v3M8 6.5v3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
         </svg>
       </button>
-      <select class="rate-select" bind:value={pollRate} onchange={handleRateChange} title="Polling rate">
-        <option value={20}>Fast</option>
-        <option value={50}>Mid</option>
-        <option value={200}>Slow</option>
+      <select class="rate-select" bind:value={pollRate} onchange={handleRateChange} title={$t("pollingRate")}>
+        <option value={20}>{$t("fast")}</option>
+        <option value={50}>{$t("mid")}</option>
+        <option value={200}>{$t("slow")}</option>
       </select>
     </div>
   </div>
@@ -319,15 +325,15 @@
     <div class="chart-legend">
       <button class="legend-item" class:off={!showVoltage} onclick={() => toggleSeries(1)}>
         <span class="legend-dot" style:background="var(--color-voltage)"></span>
-        Voltage
+        {$t("voltage")}
       </button>
       <button class="legend-item" class:off={!showCurrent} onclick={() => toggleSeries(2)}>
         <span class="legend-dot" style:background="var(--color-current)"></span>
-        Current
+        {$t("current")}
       </button>
       <button class="legend-item" class:off={!showPower} onclick={() => toggleSeries(3)}>
         <span class="legend-dot" style:background="var(--color-power)"></span>
-        Power
+        {$t("power")}
       </button>
     </div>
   </div>

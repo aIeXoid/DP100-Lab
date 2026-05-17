@@ -22,6 +22,7 @@
 
   import { invoke } from "@tauri-apps/api/core";
   import { openUrl } from "@tauri-apps/plugin-opener";
+  import { t } from "$lib/i18n";
 
   let { open, onclose }: Props = $props();
 
@@ -154,6 +155,10 @@
     debugLogPath = path;
   }
 
+  function openCoffeePage() {
+    openUrl("https://buymeacoffee.com/aleXoid");
+  }
+
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === "Escape") onclose();
   }
@@ -162,17 +167,16 @@
 {#if open}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="backdrop" onclick={onclose} onkeydown={handleKeydown}>
-    <!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
-    <div class="sheet" onclick={(e) => e.stopPropagation()}>
+    <div class="sheet" role="dialog" aria-modal="true" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
       <div class="sheet-header">
         <nav class="tab-bar">
-          <button class="tab" class:active={activeTab === "presets"} onclick={() => activeTab = "presets"}>Presets</button>
-          <button class="tab" class:active={activeTab === "protection"} onclick={() => activeTab = "protection"}>Protection</button>
-          <button class="tab" class:active={activeTab === "advanced"} onclick={() => activeTab = "advanced"}>Advanced</button>
-          <button class="tab" class:active={activeTab === "device"} onclick={() => activeTab = "device"}>Device</button>
-          <button class="tab" class:active={activeTab === "about"} onclick={() => activeTab = "about"}>About</button>
+          <button class="tab" class:active={activeTab === "presets"} onclick={() => activeTab = "presets"}>{$t("presets")}</button>
+          <button class="tab" class:active={activeTab === "protection"} onclick={() => activeTab = "protection"}>{$t("protection")}</button>
+          <button class="tab" class:active={activeTab === "advanced"} onclick={() => activeTab = "advanced"}>{$t("advanced")}</button>
+          <button class="tab" class:active={activeTab === "device"} onclick={() => activeTab = "device"}>{$t("device")}</button>
+          <button class="tab" class:active={activeTab === "about"} onclick={() => activeTab = "about"}>{$t("about")}</button>
         </nav>
-        <button class="close-btn" onclick={onclose} aria-label="Close settings">
+        <button class="close-btn" onclick={onclose} aria-label={$t("closeSettings")}>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
@@ -190,14 +194,14 @@
                   class:editing={preset.index === editingPreset}
                   ondblclick={() => handleActivate(preset.index)}
                   onclick={() => startEdit(preset.index)}
-                  title="Click to edit · Double-click to activate"
+                  title={$t("tooltipPreset")}
                 >
                   <span class="preset-index">P{preset.index}</span>
                   <div class="preset-params">
                     <span>{preset.voltage.toFixed(2)} V</span>
                     <span>{preset.current.toFixed(3)} A</span>
-                    <span class="dim">OVP {preset.ovp.toFixed(1)}</span>
-                    <span class="dim">OCP {preset.ocp.toFixed(2)}</span>
+                    <span class="dim">{$t("ovp")} {preset.ovp.toFixed(1)}</span>
+                    <span class="dim">{$t("ocp")} {preset.ocp.toFixed(2)}</span>
                   </div>
                 </button>
               {/each}
@@ -206,122 +210,122 @@
             {#if editingPreset != null}
               <div class="preset-edit">
                 <div class="preset-edit-header">
-                  <span class="preset-edit-title">Edit P{editingPreset}</span>
+                  <span class="preset-edit-title">{$t("editPreset", { index: editingPreset })}</span>
                   <div class="preset-edit-actions">
-                    <button class="btn-small" onclick={cancelEdit}>Cancel</button>
-                    <button class="btn-small primary" onclick={handleSavePreset}>Save</button>
-                    <button class="btn-small activate" onclick={() => handleActivate(editingPreset!)}>Activate</button>
+                    <button class="btn-small" onclick={cancelEdit}>{$t("cancel")}</button>
+                    <button class="btn-small primary" onclick={handleSavePreset}>{$t("save")}</button>
+                    <button class="btn-small activate" onclick={() => handleActivate(editingPreset!)}>{$t("activate")}</button>
                   </div>
                 </div>
                 <div class="edit-fields">
                   <div class="field">
-                    <label>Voltage (V)</label>
-                    <div class="input-wrap"><input type="number" step="0.01" min="0" max="30.5" bind:value={editV} /></div>
+                    <label for="edit-v">{$t("voltage")} (V)</label>
+                    <div class="input-wrap"><input id="edit-v" type="number" step="0.01" min="0" max="30.5" bind:value={editV} /></div>
                   </div>
                   <div class="field">
-                    <label>Current (A)</label>
-                    <div class="input-wrap"><input type="number" step="0.001" min="0" max="5.05" bind:value={editI} /></div>
+                    <label for="edit-i">{$t("current")} (A)</label>
+                    <div class="input-wrap"><input id="edit-i" type="number" step="0.001" min="0" max="5.05" bind:value={editI} /></div>
                   </div>
                   <div class="field">
-                    <label>OVP (V)</label>
-                    <div class="input-wrap"><input type="number" step="0.1" min="0" max="30.5" bind:value={editOvp} /></div>
+                    <label for="edit-ovp">{$t("ovpVolt")}</label>
+                    <div class="input-wrap"><input id="edit-ovp" type="number" step="0.1" min="0" max="30.5" bind:value={editOvp} /></div>
                   </div>
                   <div class="field">
-                    <label>OCP (A)</label>
-                    <div class="input-wrap"><input type="number" step="0.01" min="0" max="5.05" bind:value={editOcp} /></div>
+                    <label for="edit-ocp">{$t("ocpAmp")}</label>
+                    <div class="input-wrap"><input id="edit-ocp" type="number" step="0.01" min="0" max="5.05" bind:value={editOcp} /></div>
                   </div>
                 </div>
               </div>
             {/if}
           {:else}
-            <p class="empty-tab">Connect device to view presets</p>
+            <p class="empty-tab">{$t("connectDevicePresets")}</p>
           {/if}
 
         {:else if activeTab === "protection"}
           <div class="sys-grid">
             <div class="field">
-              <label>Over-Power (OPP)</label>
+              <label for="sys-opp">{$t("overPower")}</label>
               <div class="input-wrap">
-                <input type="number" step="0.1" min="0" max="105" bind:value={sysOpp} oninput={markSysDirty} />
+                <input id="sys-opp" type="number" step="0.1" min="0" max="105" bind:value={sysOpp} oninput={markSysDirty} />
                 <span class="input-unit">W</span>
               </div>
             </div>
             <div class="field">
-              <label>Over-Temperature (OTP)</label>
+              <label for="sys-otp">{$t("overTemperature")}</label>
               <div class="input-wrap">
-                <input type="number" step="5" min="50" max="80" bind:value={sysOtp} oninput={markSysDirty} />
+                <input id="sys-otp" type="number" step="5" min="50" max="80" bind:value={sysOtp} oninput={markSysDirty} />
                 <span class="input-unit">°C</span>
               </div>
             </div>
             <div class="field">
-              <label>Backlight</label>
+              <label for="sys-backlight">{$t("backlight")}</label>
               <div class="input-wrap">
-                <input type="number" step="1" min="0" max="4" bind:value={sysBlk} oninput={markSysDirty} />
+                <input id="sys-backlight" type="number" step="1" min="0" max="4" bind:value={sysBlk} oninput={markSysDirty} />
               </div>
             </div>
             <div class="field">
-              <label>Volume</label>
+              <label for="sys-volume">{$t("volume")}</label>
               <div class="input-wrap">
-                <input type="number" step="1" min="0" max="4" bind:value={sysVol} oninput={markSysDirty} />
+                <input id="sys-volume" type="number" step="1" min="0" max="4" bind:value={sysVol} oninput={markSysDirty} />
               </div>
             </div>
           </div>
           <div class="toggle-row">
             <label class="toggle-label">
               <input type="checkbox" bind:checked={sysRep} onchange={markSysDirty} />
-              <span>Reverse Protection</span>
+              <span>{$t("reverseProtection")}</span>
             </label>
             <label class="toggle-label">
               <input type="checkbox" bind:checked={sysAuto} onchange={markSysDirty} />
-              <span>Auto Output on Boot</span>
+              <span>{$t("autoOutputOnBoot")}</span>
             </label>
           </div>
           {#if sysDirty}
-            <button class="btn-primary" onclick={applySysSettings}>Apply</button>
+            <button class="btn-primary" onclick={applySysSettings}>{$t("apply")}</button>
           {/if}
 
         {:else if activeTab === "advanced"}
-          <h4 class="sub-title">Voltage / Current Scanning</h4>
+          <h4 class="sub-title">{$t("voltageCurrentScanning")}</h4>
           <div class="sys-grid">
             <div class="field">
-              <label>Mode</label>
-              <select class="select-input" bind:value={scanMode}>
-                <option value={1}>Voltage Scan (CV)</option>
-                <option value={0}>Current Scan (CC)</option>
+              <label for="scan-mode">{$t("mode")}</label>
+              <select id="scan-mode" class="select-input" bind:value={scanMode}>
+                <option value={1}>{$t("voltageScan")}</option>
+                <option value={0}>{$t("currentScan")}</option>
               </select>
             </div>
             <div class="field">
-              <label>{scanMode === 1 ? "Fixed Current" : "Fixed Voltage"}</label>
+              <label for="scan-out">{scanMode === 1 ? $t("fixedCurrent") : $t("fixedVoltage")}</label>
               <div class="input-wrap">
-                <input type="number" step="0.1" bind:value={scanOutVal} />
+                <input id="scan-out" type="number" step="0.1" bind:value={scanOutVal} />
                 <span class="input-unit">{scanMode === 1 ? "A" : "V"}</span>
               </div>
             </div>
             <div class="field">
-              <label>Start</label>
+              <label for="scan-start">{$t("start")}</label>
               <div class="input-wrap">
-                <input type="number" step="0.1" bind:value={scanStart} />
+                <input id="scan-start" type="number" step="0.1" bind:value={scanStart} />
                 <span class="input-unit">{scanMode === 1 ? "V" : "A"}</span>
               </div>
             </div>
             <div class="field">
-              <label>End</label>
+              <label for="scan-end">{$t("end")}</label>
               <div class="input-wrap">
-                <input type="number" step="0.1" bind:value={scanEnd} />
+                <input id="scan-end" type="number" step="0.1" bind:value={scanEnd} />
                 <span class="input-unit">{scanMode === 1 ? "V" : "A"}</span>
               </div>
             </div>
             <div class="field">
-              <label>Step</label>
+              <label for="scan-step">{$t("step")}</label>
               <div class="input-wrap">
-                <input type="number" step="0.01" bind:value={scanStep} />
+                <input id="scan-step" type="number" step="0.01" bind:value={scanStep} />
                 <span class="input-unit">{scanMode === 1 ? "V" : "A"}</span>
               </div>
             </div>
             <div class="field">
-              <label>Delay</label>
+              <label for="scan-delay">{$t("delay")}</label>
               <div class="input-wrap">
-                <input type="number" step="100" min="1" max="9999" bind:value={scanDelay} />
+                <input id="scan-delay" type="number" step="100" min="1" max="9999" bind:value={scanDelay} />
                 <span class="input-unit">ms</span>
               </div>
             </div>
@@ -329,11 +333,11 @@
           <div class="action-row">
             {#if $scanStatus.active}
               <div class="scan-progress">
-                <span>Step {$scanStatus.current_step + 1}/{$scanStatus.total_steps} — {$scanStatus.current_value.toFixed(2)} {scanMode === 1 ? "V" : "A"}</span>
+                <span>{$t("step")} {$scanStatus.current_step + 1}/{$scanStatus.total_steps} - {$scanStatus.current_value.toFixed(2)} {scanMode === 1 ? "V" : "A"}</span>
               </div>
-              <button class="btn-primary btn-danger" onclick={handleStopScan}>Stop Scan</button>
+              <button class="btn-primary btn-danger" onclick={handleStopScan}>{$t("stopScan")}</button>
             {:else}
-              <button class="btn-primary" onclick={handleStartScan}>Start Scan</button>
+              <button class="btn-primary" onclick={handleStartScan}>{$t("startScan")}</button>
             {/if}
           </div>
 
@@ -341,32 +345,32 @@
           {#if $deviceInfo}
             <div class="info-grid">
               <div class="info-row">
-                <span class="info-label">Model</span>
+                <span class="info-label">{$t("model")}</span>
                 <span class="info-value">{$deviceInfo.name}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Serial</span>
+                <span class="info-label">{$t("serial")}</span>
                 <span class="info-value mono">{$deviceInfo.serial}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Hardware</span>
+                <span class="info-label">{$t("hardware")}</span>
                 <span class="info-value">v{$deviceInfo.hardware_version.toFixed(1)}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Firmware</span>
+                <span class="info-label">{$t("firmware")}</span>
                 <span class="info-value">v{$deviceInfo.firmware_version.toFixed(1)}</span>
               </div>
               <div class="info-row">
-                <span class="info-label">State</span>
+                <span class="info-label">{$t("state")}</span>
                 <span class="info-value">APP</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Manufactured</span>
+                <span class="info-label">{$t("manufactured")}</span>
                 <span class="info-value">{$deviceInfo.year}-{String($deviceInfo.month).padStart(2, '0')}-{String($deviceInfo.day).padStart(2, '0')}</span>
               </div>
             </div>
           {:else}
-            <p class="empty-tab">Connect device to view info</p>
+            <p class="empty-tab">{$t("connectDeviceInfo")}</p>
           {/if}
 
         {:else if activeTab === "about"}
@@ -374,33 +378,33 @@
             <img src="/logo.png" alt="DP100 Lab" class="about-logo" />
             <p class="about-version">v0.1.0</p>
             <p class="about-desc">
-              Open-source macOS app for Alientek DP100 digital power supply.
+              {$t("openSourceDesc")}
             </p>
-            <button class="btn-coffee" onclick={() => openUrl("https://buymeacoffee.com/aleXoid")}>
-              ☕ Buy Me a Coffee
+            <button class="btn-coffee" onclick={openCoffeePage}>
+              {$t("buyMeACoffee")}
             </button>
             <div class="about-links">
               <div class="info-row">
-                <span class="info-label">Stack</span>
+                <span class="info-label">{$t("stack")}</span>
                 <span class="info-value">Tauri · Svelte · Rust</span>
               </div>
               <div class="info-row">
-                <span class="info-label">Device</span>
+                <span class="info-label">{$t("device")}</span>
                 <span class="info-value">ATK-DP100 (USB HID)</span>
               </div>
               <div class="info-row">
-                <span class="info-label">License</span>
+                <span class="info-label">{$t("license")}</span>
                 <span class="info-value">MIT</span>
               </div>
             </div>
             <div class="info-section">
-              <h4 class="sub-title">Debug</h4>
+              <h4 class="sub-title">{$t("debug")}</h4>
               <label class="toggle-label">
                 <input type="checkbox" bind:checked={debugEnabled} onchange={toggleDebugLog} />
-                <span>Protocol Logging</span>
+                <span>{$t("protocolLogging")}</span>
               </label>
               {#if debugEnabled && debugLogPath}
-                <p class="info-note">Log: {debugLogPath}</p>
+                <p class="info-note">{$t("logPath", { path: debugLogPath })}</p>
               {/if}
             </div>
           </div>

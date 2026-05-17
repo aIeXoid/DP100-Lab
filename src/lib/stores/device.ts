@@ -1,6 +1,7 @@
-import { writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { t } from "$lib/i18n";
 
 export interface Telemetry {
   input_voltage: number;
@@ -218,8 +219,9 @@ export const loggingStatus = writable<LoggingStatus>({
 
 export async function startLogging() {
   const { save } = await import("@tauri-apps/plugin-dialog");
+  const translate = get(t);
   const path = await save({
-    title: "Save CSV Log",
+    title: translate("saveCsvLog"),
     defaultPath: `dp100_log_${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.csv`,
     filters: [{ name: "CSV", extensions: ["csv"] }],
   });
@@ -294,4 +296,3 @@ export async function setSystemSettings(
     error.set(String(e));
   }
 }
-

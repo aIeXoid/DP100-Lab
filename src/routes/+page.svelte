@@ -13,6 +13,7 @@
     disconnectDevice,
     setOutput,
   } from "$lib/stores/device";
+  import { language, languages, setLanguage, t, type Language } from "$lib/i18n";
   import { getCurrentWindow } from "@tauri-apps/api/window";
 
   function startDrag(e: MouseEvent) {
@@ -103,6 +104,10 @@
       if ($settings) currentInput = $settings.current.toFixed(3);
     }
   }
+
+  function handleLanguageChange(e: Event) {
+    setLanguage((e.currentTarget as HTMLSelectElement).value as Language);
+  }
 </script>
 
 <div class="window">
@@ -119,15 +124,20 @@
         <span class="titlebar-subtitle">v{$deviceInfo.firmware_version.toFixed(1)}</span>
       {:else if $connecting}
         <span class="titlebar-dot connecting"></span>
-        <span class="titlebar-title">Connecting…</span>
+        <span class="titlebar-title">{$t("connecting")}</span>
       {:else}
         <span class="titlebar-dot disconnected"></span>
         <span class="titlebar-title">DP100 Lab</span>
       {/if}
     </div>
     <div class="titlebar-right">
+      <select class="language-select" value={$language} onchange={handleLanguageChange} title={$t("language")}>
+        {#each languages as option}
+          <option value={option.code}>{option.label}</option>
+        {/each}
+      </select>
       {#if $connected}
-        <button class="icon-btn" onclick={() => settingsOpen = true} title="Settings">
+        <button class="icon-btn" onclick={() => settingsOpen = true} title={$t("settings")}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M6.5 1.5h3L10 3.2l1.7-.7 2.1 1.2-1 2 .8 1.6 1.9.2v2.4l-1.9.2-.8 1.6 1 2-2.1 1.2-1.7-.7-.5 1.7h-3L6 13.3l-1.7.7-2.1-1.2 1-2-.8-1.6-1.9-.2V6.6l1.9-.2.8-1.6-1-2L4.3 1.6 6 2.3l.5-1.8z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/>
             <circle cx="8" cy="8.5" r="2" stroke="currentColor" stroke-width="1.1"/>
@@ -149,19 +159,19 @@
             <path d="M24 20v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-        <h2 class="empty-title">Connect DP100</h2>
-        <p class="empty-desc">Connect your Alientek DP100 power supply via USB</p>
+        <h2 class="empty-title">{$t("connectDp100")}</h2>
+        <p class="empty-desc">{$t("connectViaUsb")}</p>
         {#if $error}
           <p class="empty-error">{$error}</p>
         {/if}
         <button class="btn-connect" onclick={handleConnect}>
-          Connect
+          {$t("connect")}
         </button>
       </div>
     {:else if $connecting}
       <div class="empty-state">
         <div class="spinner"></div>
-        <p class="empty-desc">Looking for DP100…</p>
+        <p class="empty-desc">{$t("lookingForDp100")}</p>
       </div>
     {:else}
       <!-- Dashboard -->
@@ -169,7 +179,7 @@
         <!-- Metrics Row -->
         <div class="metrics-row">
           <MetricCard
-            label="Voltage"
+            label={$t("voltage")}
             value={$telemetry?.output_voltage ?? 0}
             unit="V"
             max={$telemetry?.max_voltage ?? 30.5}
@@ -178,7 +188,7 @@
             precision={2}
           />
           <MetricCard
-            label="Current"
+            label={$t("current")}
             value={$telemetry?.output_current ?? 0}
             unit="A"
             max={5.1}
@@ -187,7 +197,7 @@
             precision={3}
           />
           <MetricCard
-            label="Power"
+            label={$t("power")}
             value={$telemetry?.power ?? 0}
             unit="W"
             max={155}
@@ -203,19 +213,19 @@
         <div class="controls-section">
           <div class="controls-row">
             <div class="output-toggle">
-              <span class="control-label">Output</span>
+              <span class="control-label">{$t("output")}</span>
               <button
                 class="toggle-btn"
                 class:on={$settings?.enabled}
                 onclick={toggleOutput}
               >
-                {$settings?.enabled ? "ON" : "OFF"}
+                {$settings?.enabled ? $t("on") : $t("off")}
               </button>
             </div>
 
             <div class="set-fields">
               <div class="set-field">
-                <label for="set-v">Set Voltage <span class="field-hint">max {maxVoltage.toFixed(1)}V</span></label>
+                <label for="set-v">{$t("setVoltage")} <span class="field-hint">{$t("max", { value: `${maxVoltage.toFixed(1)}V` })}</span></label>
                 <div class="input-row">
                   <div class="input-wrap" class:dirty={voltageDirty}>
                     <input
@@ -231,12 +241,12 @@
                     <span class="input-unit">V</span>
                   </div>
                   {#if voltageDirty}
-                    <button class="btn-apply" onclick={applyVoltage}>Set</button>
+                    <button class="btn-apply" onclick={applyVoltage}>{$t("set")}</button>
                   {/if}
                 </div>
               </div>
               <div class="set-field">
-                <label for="set-i">Set Current <span class="field-hint">max 5.050A</span></label>
+                <label for="set-i">{$t("setCurrent")} <span class="field-hint">{$t("max", { value: "5.050A" })}</span></label>
                 <div class="input-row">
                   <div class="input-wrap" class:dirty={currentDirty}>
                     <input
@@ -252,7 +262,7 @@
                     <span class="input-unit">A</span>
                   </div>
                   {#if currentDirty}
-                    <button class="btn-apply" onclick={applyCurrent}>Set</button>
+                    <button class="btn-apply" onclick={applyCurrent}>{$t("set")}</button>
                   {/if}
                 </div>
               </div>
@@ -263,37 +273,37 @@
         <!-- Status Bar -->
         <footer class="status-bar">
           <div class="status-item">
-            <span class="status-label">Input</span>
+            <span class="status-label">{$t("input")}</span>
             <span class="status-value">{($telemetry?.input_voltage ?? 0).toFixed(2)} V</span>
           </div>
           <div class="status-sep"></div>
           <div class="status-item">
-            <span class="status-label">Temp</span>
+            <span class="status-label">{$t("temp")}</span>
             <span class="status-value">{($telemetry?.temperature1 ?? 0).toFixed(1)}° / {($telemetry?.temperature2 ?? 0).toFixed(1)}°</span>
           </div>
           <div class="status-sep"></div>
           <div class="status-item">
-            <span class="status-label">Mode</span>
+            <span class="status-label">{$t("mode")}</span>
             <span class="status-value">{$telemetry?.output_mode ?? "—"}</span>
           </div>
           <div class="status-sep"></div>
           <div class="status-item">
-            <span class="status-label">Status</span>
+            <span class="status-label">{$t("status")}</span>
             <span class="status-value" class:status-warn={$telemetry?.work_state !== "Normal"}>{$telemetry?.work_state ?? "—"}</span>
           </div>
           <div class="status-sep"></div>
           <div class="status-item">
-            <span class="status-label">Energy</span>
+            <span class="status-label">{$t("energy")}</span>
             <span class="status-value">{energyWh.toFixed(3)} Wh</span>
           </div>
           <div class="status-sep"></div>
           <div class="status-item">
-            <span class="status-label">5V Rail</span>
+            <span class="status-label">{$t("rail5v")}</span>
             <span class="status-value">{($telemetry?.rail_5v ?? 0).toFixed(2)} V</span>
           </div>
           <div class="status-spacer"></div>
           <button class="disconnect-btn" onclick={disconnectDevice}>
-            Disconnect
+            {$t("disconnect")}
           </button>
         </footer>
       </div>
@@ -335,10 +345,12 @@
   }
 
   .titlebar-right {
-    width: 70px;
+    width: 138px;
     flex-shrink: 0;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
   }
 
   .titlebar-dot {
@@ -390,6 +402,22 @@
   .icon-btn:hover {
     background: var(--bg-tertiary);
     color: var(--text-primary);
+  }
+
+  .language-select {
+    width: 84px;
+    height: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    padding: 0 6px;
+    outline: none;
+  }
+
+  .language-select:focus {
+    border-color: var(--system-blue);
   }
 
   /* Content */
