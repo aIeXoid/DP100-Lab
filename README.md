@@ -1,48 +1,6 @@
 # DP100 Lab
 
-## Fork status / Fork 当前进展
-
-**English**
-
-This fork is based on upstream `v0.1.0` and is currently maintained on the `i18n-linux-build` development branch.
-
-- Added a Linux x86_64 runnable build for Arch Linux and similar desktop Linux systems.
-- Added an English / Chinese UI language switch with persisted preference.
-- Localized the main dashboard, settings sheet, chart controls, and CSV save dialog.
-- Added `bun run build:app` to build a runnable Tauri binary without AppImage bundling.
-- Published a Linux test release: [v0.1.0-linux-i18n](https://github.com/HosakaSu/DP100-Lab/releases/tag/v0.1.0-linux-i18n).
-
-Linux quick start:
-
-```bash
-tar -xzf DP100-Lab-v0.1.0-linux-i18n-x86_64.tar.gz
-cd DP100-Lab-v0.1.0-linux-i18n-x86_64
-./dp100-app
-```
-
-The DP100 is accessed through USB HID. On Linux, make sure the `hidraw` node for vendor `2e3c` and product `af01` is readable by the current user.
-
-**中文**
-
-这个 fork 基于上游 `v0.1.0`，当前主要修改维护在 `i18n-linux-build` 开发分支。
-
-- 增加了适用于 Arch Linux 及类似桌面 Linux 系统的 x86_64 可运行构建。
-- 增加了英文 / 中文界面切换，并持久保存语言偏好。
-- 已本地化主界面、设置面板、图表控件和 CSV 保存对话框。
-- 增加 `bun run build:app`，用于构建可直接运行的 Tauri 二进制文件并跳过 AppImage 打包。
-- 已发布 Linux 测试版：[v0.1.0-linux-i18n](https://github.com/HosakaSu/DP100-Lab/releases/tag/v0.1.0-linux-i18n)。
-
-Linux 快速运行：
-
-```bash
-tar -xzf DP100-Lab-v0.1.0-linux-i18n-x86_64.tar.gz
-cd DP100-Lab-v0.1.0-linux-i18n-x86_64
-./dp100-app
-```
-
-DP100 通过 USB HID 访问。在 Linux 上，请确保 vendor `2e3c`、product `af01` 对应的 `hidraw` 设备节点可由当前用户读取。
-
----
+[中文说明](README.zh-CN.md)
 
 Native macOS app for the **Alientek DP100** digital power supply. Replaces the Windows-only official software with a modern, fast, and beautiful interface built for macOS.
 
@@ -67,6 +25,8 @@ Native macOS app for the **Alientek DP100** digital power supply. Replaces the W
 
 ## Install
 
+### macOS
+
 Download the latest `.dmg` from [Releases](../../releases).
 
 > **Note:** The app is not signed with an Apple Developer certificate. After installing, run:
@@ -75,7 +35,30 @@ Download the latest `.dmg` from [Releases](../../releases).
 > ```
 > This removes the macOS quarantine flag. Alternatively, right-click the app → Open → Open.
 
-Or build from source:
+### Linux
+
+Download the Linux x86_64 archive from [Releases](../../releases), extract it, and run the binary:
+
+```bash
+mkdir dp100-lab
+tar -xzf DP100-Lab_*_x86_64.tar.gz -C dp100-lab --strip-components=1
+./dp100-lab/dp100-app
+```
+
+The DP100 is accessed through USB HID. If the app cannot connect to the device, make sure the `hidraw` node for vendor `2e3c` and product `af01` is readable by the current user. For example, a udev rule can grant access:
+
+```text
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2e3c", ATTRS{idProduct}=="af01", MODE="0666", TAG+="uaccess"
+```
+
+After adding a udev rule, reload rules and reconnect the device:
+
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+### Build from source
 
 ```bash
 # Prerequisites
@@ -90,6 +73,11 @@ bun run tauri build
 ```
 
 The `.app` bundle will be in `src-tauri/target/release/bundle/macos/`.
+On Linux, `bun run build:app` builds a runnable binary without generating AppImage bundles:
+
+```bash
+bun run build:app
+```
 
 ## Development
 
