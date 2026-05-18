@@ -1,6 +1,6 @@
 {
   "name": "dp100-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Native macOS app for Alientek DP100 digital power supply",
   "type": "module",
   "scripts": {
