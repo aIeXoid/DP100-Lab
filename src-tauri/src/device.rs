@@ -11,10 +11,6 @@ pub fn set_debug_logging(enabled: bool) {
     DEBUG_LOG.store(enabled, Ordering::Relaxed);
 }
 
-pub fn is_debug_logging() -> bool {
-    DEBUG_LOG.load(Ordering::Relaxed)
-}
-
 fn debug_log_path() -> std::path::PathBuf {
     let dir = dirs::home_dir()
         .unwrap_or_default()

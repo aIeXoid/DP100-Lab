@@ -1,5 +1,7 @@
 # DP100 Lab
 
+[中文说明](README.zh-CN.md)
+
 Native macOS app for the **Alientek DP100** digital power supply. Replaces the Windows-only official software with a modern, fast, and beautiful interface built for macOS.
 
 ![DP100 Lab Screenshot](docs/screenshot.png)
@@ -23,6 +25,8 @@ Native macOS app for the **Alientek DP100** digital power supply. Replaces the W
 
 ## Install
 
+### macOS
+
 Download the latest `.dmg` from [Releases](../../releases).
 
 > **Note:** The app is not signed with an Apple Developer certificate. After installing, run:
@@ -31,7 +35,30 @@ Download the latest `.dmg` from [Releases](../../releases).
 > ```
 > This removes the macOS quarantine flag. Alternatively, right-click the app → Open → Open.
 
-Or build from source:
+### Linux
+
+Download the Linux x86_64 archive from [Releases](../../releases), extract it, and run the binary:
+
+```bash
+mkdir dp100-lab
+tar -xzf DP100-Lab_*_x86_64.tar.gz -C dp100-lab --strip-components=1
+./dp100-lab/dp100-app
+```
+
+The DP100 is accessed through USB HID. If the app cannot connect to the device, make sure the `hidraw` node for vendor `2e3c` and product `af01` is readable by the current user. For example, a udev rule can grant access:
+
+```text
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2e3c", ATTRS{idProduct}=="af01", MODE="0666", TAG+="uaccess"
+```
+
+After adding a udev rule, reload rules and reconnect the device:
+
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+### Build from source
 
 ```bash
 # Prerequisites
@@ -46,6 +73,11 @@ bun run tauri build
 ```
 
 The `.app` bundle will be in `src-tauri/target/release/bundle/macos/`.
+On Linux, `bun run build:app` builds a runnable binary without generating AppImage bundles:
+
+```bash
+bun run build:app
+```
 
 ## Development
 
