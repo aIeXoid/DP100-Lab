@@ -13,7 +13,7 @@
     disconnectDevice,
     setOutput,
   } from "$lib/stores/device";
-  import { language, languages, setLanguage, t, type Language } from "$lib/i18n";
+  import { t } from "$lib/i18n";
   import { getCurrentWindow } from "@tauri-apps/api/window";
 
   function startDrag(e: MouseEvent) {
@@ -105,9 +105,6 @@
     }
   }
 
-  function handleLanguageChange(e: Event) {
-    setLanguage((e.currentTarget as HTMLSelectElement).value as Language);
-  }
 </script>
 
 <div class="window">
@@ -131,11 +128,6 @@
       {/if}
     </div>
     <div class="titlebar-right">
-      <select class="language-select" value={$language} onchange={handleLanguageChange} title={$t("language")}>
-        {#each languages as option}
-          <option value={option.code}>{option.label}</option>
-        {/each}
-      </select>
       {#if $connected}
         <button class="icon-btn" onclick={() => settingsOpen = true} title={$t("settings")}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -402,22 +394,6 @@
   .icon-btn:hover {
     background: var(--bg-tertiary);
     color: var(--text-primary);
-  }
-
-  .language-select {
-    width: 84px;
-    height: 28px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--text-secondary);
-    font-size: 12px;
-    padding: 0 6px;
-    outline: none;
-  }
-
-  .language-select:focus {
-    border-color: var(--system-blue);
   }
 
   /* Content */

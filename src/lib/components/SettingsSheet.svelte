@@ -22,11 +22,11 @@
 
   import { invoke } from "@tauri-apps/api/core";
   import { openUrl } from "@tauri-apps/plugin-opener";
-  import { t } from "$lib/i18n";
+  import { language, languages, setLanguage, t, type Language } from "$lib/i18n";
 
   let { open, onclose }: Props = $props();
 
-  type Tab = "presets" | "protection" | "advanced" | "device" | "about";
+  type Tab = "presets" | "protection" | "advanced" | "device" | "prefs" | "about";
   let activeTab = $state<Tab>("presets");
 
   // Scanning
@@ -174,6 +174,7 @@
           <button class="tab" class:active={activeTab === "protection"} onclick={() => activeTab = "protection"}>{$t("protection")}</button>
           <button class="tab" class:active={activeTab === "advanced"} onclick={() => activeTab = "advanced"}>{$t("advanced")}</button>
           <button class="tab" class:active={activeTab === "device"} onclick={() => activeTab = "device"}>{$t("device")}</button>
+          <button class="tab" class:active={activeTab === "prefs"} onclick={() => activeTab = "prefs"}>{$t("settings")}</button>
           <button class="tab" class:active={activeTab === "about"} onclick={() => activeTab = "about"}>{$t("about")}</button>
         </nav>
         <button class="close-btn" onclick={onclose} aria-label={$t("closeSettings")}>
@@ -373,10 +374,31 @@
             <p class="empty-tab">{$t("connectDeviceInfo")}</p>
           {/if}
 
+        {:else if activeTab === "prefs"}
+          <div class="info-grid">
+            <div class="info-row">
+              <span class="info-label">{$t("language")}</span>
+              <select class="lang-select" value={$language} onchange={(e) => setLanguage((e.currentTarget as HTMLSelectElement).value as Language)}>
+                {#each languages as option}
+                  <option value={option.code}>{option.label}</option>
+                {/each}
+              </select>
+            </div>
+            <div class="info-row">
+              <span class="info-label">{$t("protocolLogging")}</span>
+              <button class="toggle-switch" class:on={debugEnabled} onclick={() => { debugEnabled = !debugEnabled; toggleDebugLog(); }}>
+                <span class="toggle-knob"></span>
+              </button>
+            </div>
+            {#if debugEnabled && debugLogPath}
+              <p class="info-note">{$t("logPath", { path: debugLogPath })}</p>
+            {/if}
+          </div>
+
         {:else if activeTab === "about"}
           <div class="about">
             <img src="/logo.png" alt="DP100 Lab" class="about-logo" />
-            <p class="about-version">v0.1.0</p>
+            <p class="about-version">v0.1.1</p>
             <p class="about-desc">
               {$t("openSourceDesc")}
             </p>
@@ -396,16 +418,6 @@
                 <span class="info-label">{$t("license")}</span>
                 <span class="info-value">MIT</span>
               </div>
-            </div>
-            <div class="info-section">
-              <h4 class="sub-title">{$t("debug")}</h4>
-              <label class="toggle-label">
-                <input type="checkbox" bind:checked={debugEnabled} onchange={toggleDebugLog} />
-                <span>{$t("protocolLogging")}</span>
-              </label>
-              {#if debugEnabled && debugLogPath}
-                <p class="info-note">{$t("logPath", { path: debugLogPath })}</p>
-              {/if}
             </div>
           </div>
         {/if}
@@ -432,7 +444,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2), 0 2px 12px rgba(0, 0, 0, 0.1);
-    width: 520px;
+    width: 600px;
     max-height: 85vh;
     overflow-y: auto;
     animation: slideUp 0.2s ease-out;
@@ -454,15 +466,16 @@
   }
 
   .tab {
-    padding: 5px 14px;
+    padding: 5px 10px;
     border: none;
     border-radius: 4px;
     background: transparent;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.15s;
+    white-space: nowrap;
   }
 
   .tab:hover {
@@ -495,7 +508,7 @@
   }
 
   .sheet-body {
-    padding: 16px;
+    padding: 16px 20px;
   }
 
   .empty-tab {
@@ -784,6 +797,66 @@
   }
 
   /* About */
+  .sheet-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 16px;
+    border-top: 1px solid var(--separator);
+  }
+
+  .about-footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--separator);
+  }
+
+  .toggle-switch {
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bg-tertiary);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    padding: 0;
+  }
+
+  .toggle-switch.on {
+    background: var(--system-green);
+  }
+
+  .toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    transition: left 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
+  .toggle-switch.on .toggle-knob {
+    left: 18px;
+  }
+
+  .lang-select {
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .lang-select:focus {
+    border-color: var(--system-blue);
+  }
+
   .about-logo {
     height: 40px;
     margin-bottom: 8px;
